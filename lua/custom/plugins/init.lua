@@ -3,28 +3,11 @@
 --
 -- See the kickstart.nvim README for more information
 
----@module 'lazy'
----@type LazySpec
-return {
-  'AckslD/nvim-neoclip.lua',
-  dependencies = {
-    { 'kkharji/sqlite.lua', module = 'sqlite' },
-    { 'nvim-telescope/telescope.nvim' },
-  },
-  config = function()
-    require('neoclip').setup {
-      -- Optional: keep unnamed + system clipboard in sync via neoclip
-      default_register = { '"', '+' },
-
-      on_select = {
-        move_to_front = true,
-        close_telescope = true,
-      },
-      on_paste = {
-        set_reg = true, -- <== update registers when using paste keys
-        move_to_front = true,
-        close_telescope = true,
-      },
-    }
-  end,
-}
+-- Iterate over all Lua files in the plugins directory and load them
+local plugins_dir = vim.fs.joinpath(vim.fn.stdpath 'config', 'lua', 'custom', 'plugins')
+for file_name, type in vim.fs.dir(plugins_dir) do
+  if type == 'file' and file_name:match '%.lua$' and file_name ~= 'init.lua' then
+    local module = file_name:gsub('%.lua$', '')
+    require('custom.plugins.' .. module)
+  end
+end
